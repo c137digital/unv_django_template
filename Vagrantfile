@@ -20,10 +20,10 @@ Vagrant.configure("2") do |config|
         privileged: false
 
     config.vm.define "app" do |app|
-        app.vm.network "private_network", ip: "10.50.25.10"
-        app.vm.hostname = "unvwebapp"
+        app.vm.network "private_network", ip: "10.60.25.10"
+        app.vm.hostname = "unvdjangoapp"
         app.vm.provider "virtualbox" do |v|
-            v.name = 'unv_web_app'
+            v.name = 'unv_django_web_app'
         end
     end
 end

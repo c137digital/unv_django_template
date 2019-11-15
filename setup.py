@@ -28,6 +28,9 @@ setup(
         'unv.app',
         'unv.web',
         'unv.deploy',
+
+        'uwsgi',
+        'django==3.0b1',
     ],
     extras_require={
         'dev': [
@@ -40,8 +43,13 @@ setup(
             'autopep8',
             'sphinx',
             'setuptools',
-            'twine'
+            'twine',
         ]
     },
-    zip_safe=True
+    zip_safe=True,
+    entry_points={
+        'console_scripts': [
+            'manage = app.components.django.bin:manage'
+        ]
+    }
 )
