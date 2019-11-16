@@ -26,7 +26,6 @@ setup(
     include_package_data=True,
     install_requires=[
         'unv.app',
-        'unv.web',
         'unv.deploy',
 
         'uwsgi',

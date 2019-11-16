@@ -2,15 +2,17 @@ Vagrant.configure("2") do |config|
     config.vm.box = "generic/ubuntu1604"
     
     config.vm.provider "virtualbox" do |v|
-        v.memory = 256
-        v.cpus = 1
+        v.memory = 384
+        v.cpus = 2
         v.customize ["modifyvm", :id, "--uartmode1", "disconnected"]
+        v.customize ["modifyvm", :id, "--vram", "12"]
     end
 
     config.vm.synced_folder ".", "/vagrant", disabled: true
     
     ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
     config.ssh.insert_key = false
+    config.vm.provision 'shell', inline: "swapoff -a"
     config.vm.provision 'shell', inline: 'rm -rf /root/.ssh'
     config.vm.provision 'shell', inline: 'mkdir -p /root/.ssh'
     config.vm.provision 'shell',
