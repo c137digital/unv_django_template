@@ -157,14 +157,15 @@ class DjangoAppTasks(AppTasks):
     async def sync(self, type_=''):
         await super().sync(type_)
 
-        await self._apt_install('build-essential')
+        # install psycopg2
+        # await self._apt_install('build-essential')
 
-        # TODO: fix postgres
-        # /sbin/ldconfig /usr/local/pgsql/lib
+        # # TODO: fix postgres
+        # # /sbin/ldconfig /usr/local/pgsql/lib
 
-        # TODO: fix user paths
-        with self._prefix('PATH=$PATH:/home/postgres/app/bin'):
-            await self._run('/home/django/python/bin/pip install psycopg2')
+        # # TODO: fix user paths
+        # with self._prefix('PATH=$PATH:/home/postgres/app/bin'):
+        #     await self._run('/home/django/python/bin/pip install psycopg2')
 
         await self.manage('collectstatic')
 

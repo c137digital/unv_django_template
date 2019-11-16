@@ -34,6 +34,7 @@ setup(
     ],
     extras_require={
         'dev': [
+            'psycopg2-binary',
             'pylint',
             'pycodestyle',
             'pytest',
