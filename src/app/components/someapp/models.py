@@ -2,7 +2,7 @@ from django.db import models
 
 
 class BusinessModel(models.Model):
-    logo = models.ImageField(upload_to='business/')
+    # logo = models.ImageField(upload_to='business/')
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=512)
 

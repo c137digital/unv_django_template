@@ -11,17 +11,21 @@ SETTINGS = ComponentSettings.create({
     'deploy': {
         'hosts': {
             'vagrant': {
-                'public_ip': '10.60.25.10',
-                'private_ip': '10.60.25.10',
-                'components': ['iptables', 'nginx', 'django', 'postgres'],
+                'public_ip': '10.50.40.15',
+                'private_ip': '0.0.0.0',
+                'components': [
+                    'iptables', 'nginx', 'django', 'postgres', 'redis'
+                ],
             }
         },
         'components': {
             'django': {
                 'settings': 'app.settings.dev',
+                'domain': 'app.local',
+                'use_https': False
             },
             'nginx': {
-                'geoip2': True
+                'geoip2': False
             }
         }
     }

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name='web_app',
+    name='django_web_app',
     version='0.1',
     description="""Provide description""",
     url='http://github.com/',
@@ -28,8 +28,12 @@ setup(
         'unv.app',
         'unv.deploy',
 
-        'uwsgi',
-        'django==3.0b1',
+        'django',
+        'djangorestframework',
+        'django-redis-cache',
+
+        'hiredis',
+        'uwsgi'
     ],
     extras_require={
         'dev': [

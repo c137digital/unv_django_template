@@ -1,9 +1,7 @@
-from django.contrib import admin
+from ..django.admin import admin
 
 from .models import BusinessModel, ClientModel
 
-# class AuthorAdmin(admin.ModelAdmin):
-#     pass
 
-admin.site.register(BusinessModel)
-admin.site.register(ClientModel)
+admin.register(BusinessModel)
+admin.register(ClientModel)

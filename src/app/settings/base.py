@@ -1,18 +1,21 @@
 BASE_SETTINGS = {
     'app': {
-        'components': [
-            'app.components.site',
-        ]
+        'components': []
     },
     'deploy': {
         'components': {
             'django': {
                 'bin': 'uwsgi',
-                'use_https': False,
                 'systemd': {
                     'instances': {'percent': 100}
                 }
             },
+            'redis': {
+                'listen_private_ip': True
+            },
+            'nginx': {
+                'geoip2': False
+            }
         },
         'tasks': [
             # by default use all tasks from component only

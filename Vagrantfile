@@ -1,18 +1,28 @@
 Vagrant.configure("2") do |config|
-    config.vm.box = "generic/ubuntu1604"
+    name = File.read('setup.py').split("name='")[1].split("'")[0]
+    name = name.gsub('_', '')
+
+    config.vm.box = "generic/debian10"
+    ip = "10.50.40.15"
+    memory = 512
+    cpus = 2
     
     config.vm.provider "virtualbox" do |v|
-        v.memory = 384
-        v.cpus = 2
+        v.memory = memory
+        v.cpus = cpus
         v.customize ["modifyvm", :id, "--uartmode1", "disconnected"]
         v.customize ["modifyvm", :id, "--vram", "12"]
     end
+
+    config.vm.provider "parallels" do |prl|
+        prl.memory = memory
+        prl.cpus = cpus
+      end
 
     config.vm.synced_folder ".", "/vagrant", disabled: true
     
     ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
     config.ssh.insert_key = false
-    config.vm.provision 'shell', inline: "swapoff -a"
     config.vm.provision 'shell', inline: 'rm -rf /root/.ssh'
     config.vm.provision 'shell', inline: 'mkdir -p /root/.ssh'
     config.vm.provision 'shell',
@@ -22,10 +32,15 @@ Vagrant.configure("2") do |config|
         privileged: false
 
     config.vm.define "app" do |app|
-        app.vm.network "private_network", ip: "10.60.25.10"
-        app.vm.hostname = "unvdjangoapp"
+        app.vm.network "private_network", ip: ip
+        app.vm.hostname = name
+
         app.vm.provider "virtualbox" do |v|
-            v.name = 'unv_django_web_app'
+            v.name = name
+        end
+
+        app.vm.provider "parallels" do |v|
+            v.name = name
         end
     end
 end

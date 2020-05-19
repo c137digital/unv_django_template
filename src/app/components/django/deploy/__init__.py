@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from unv.utils.collections import update_dict_recur
-from unv.deploy.tasks import register, onehost
+from unv.deploy.tasks import register, onehost, nohost
 from unv.deploy.settings import SETTINGS as DEPLOY_SETTINGS
 from unv.deploy.components.app import AppSettings, AppTasks
 
@@ -157,21 +157,58 @@ class DjangoAppTasks(AppTasks):
     async def sync(self, type_=''):
         await super().sync(type_)
 
-        # we need this stuff to deliver remotly because of db on other
-        # server
-        # install psycopg2
-        await self._sudo('ldconfig /home/postgres/app/lib')
-
+        # TODO: we need this stuff to deliver remotly because of db on other server
         # TODO: fix user paths
-        with self._prefix('PATH=$PATH:/home/postgres/app/bin'):
+        # TODO: fix PATH escape symbols
+        # TODO: move to setup
+        with self._prefix(r'PATH=\$PATH:/home/postgres/app/bin'):
             await self._run('/home/django/python/bin/pip install psycopg2')
 
-        await self.manage('collectstatic')
+        await self._sudo('ldconfig /home/postgres/app/lib')
+
+        await self.manage('collectstatic --noinput')
 
     @register
     @onehost
     async def manage(self, command):
         print(await self._python.run(
-            f'manage {command}', prefix=f'SETTINGS={self.settings.module}',
+            f'manage {command}',
+            prefix=f'PYTHONPATH=/home/django/ SETTINGS={self.settings.module}',
             interactive=True
         ))
+
+    @register
+    async def upload_static(self):
+        await self._sudo('chown -hR django /home/django/m')
+        await self._rsync('../m.bgram.app/dist', '/home/django/m')
+        await self._sudo('chown -hR nginx /home/django/m')
+
+    @register
+    async def update_hosts(self):
+        await self._local(
+            f'sudo bash -c \'echo "{self.public_ip} {self.settings.domain}"'
+            ' >> /etc/hosts\'')
+
+    @register
+    @nohost
+    async def reinit(self):
+        import os
+        # FIXME: why settings in env
+        # print(os.environ)
+        os.environ.pop('SETTINGS')
+        os.system(
+            "deploy dev postgres.restart")
+        os.system(
+            "deploy dev postgres.drop_database:django_db")
+        os.system(
+            "deploy dev postgres.create_user:django_user")
+        os.system(
+            'deploy dev postgres.create_database:django_db,django_user')
+        os.system('rm -f src/app/components/someapp/migrations/*.py')
+        os.system(
+            'touch src/app/components/someapp/migrations/__init__.py')
+        os.system('manage makemigrations')
+        os.system(
+            'deploy dev django.sync django.manage:makemigrations '
+            'django.manage:migrate'
+        )
